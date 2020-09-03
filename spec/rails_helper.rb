@@ -11,6 +11,11 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 config.include Devise::Test::ControllerHelpers, type: :controller
 
+# Custom json helpers
+config.include RequestHelpers::Response, type: :request
+# Custom Header helpers
+config.include RequestHelpers::Headers, type: :request
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
