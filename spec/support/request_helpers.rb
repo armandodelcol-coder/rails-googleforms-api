@@ -1,7 +1,7 @@
 module RequestHelpers
   module Response
     def expect_status(expectation)
-      expect(response.status).to eql(expectation)
+      expect(response).to have_http_status(expectation)
     end
 
     def json

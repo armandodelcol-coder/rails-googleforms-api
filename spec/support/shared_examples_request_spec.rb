@@ -19,6 +19,6 @@ shared_examples_for :deny_without_authorization do |method_type, action, params 
         headers: header_without_authentication
     end
 
-    expect(response.status).to eql(401)
+    expect_status(401)
   end
 end
