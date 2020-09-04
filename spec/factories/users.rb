@@ -1,13 +1,15 @@
 FactoryBot.define do
+  time = FFaker::Time.between Date.yesterday - 50, Date.today - 1
+
   factory :user do
     uid          { FFaker::Lorem.word }
     email        { FFaker::Internet.email }
     name         { FFaker::Name.name }
     nickname     { FFaker::Internet.user_name }
-    password     { FFaker::Lorem.word }
+    password     { FFaker::Internet.password }
     provider     { 'email' }
-    confirmed_at { FFaker::Time.between Date.yesterday – 50, Date.today - 1 }
-    created_at   { FFaker::Time.between Date.yesterday – 50, Date.today - 1 }
-    updated_at   { FFaker::Time.between Date.yesterday – 50, Date.today - 1 }
+    confirmed_at { time }
+    created_at   { time }
+    updated_at   { time }
   end
 end
