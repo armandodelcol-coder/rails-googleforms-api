@@ -10,11 +10,11 @@ module RequestHelpers
   end
 
   module Headers
-    def header_with_authentication user
-      return user.create_new_auth_token.merge({'HTTP_ACCEPT': 'application/json'})
+    def headers_with_authentication user
+      return user.create_new_auth_token.merge({'Accept' => 'application/json'})
     end
 
-    def header_without_authentication
+    def headers_without_authentication
       return { 'content-type' => 'application/json' }
     end
   end

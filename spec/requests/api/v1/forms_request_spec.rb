@@ -13,7 +13,8 @@ RSpec.describe "Api::V1::Forms", type: :request do
         @form1 = create(:form, user: @user)
         @form2 = create(:form, user: @user)
 
-        get "/api/v1/forms", params: {}, headers: header_with_authentication(@user)
+        @user.create_new_auth_token
+        get "/api/v1/forms", params: {}, headers: headers_with_authentication(@user)
       end
 
       it "returns 200" do
@@ -44,7 +45,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
           @question1 = create(:question, form: @form)
           @question2 = create(:question, form: @form)
 
-          get "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+          get "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: headers_with_authentication(@user)
         end
 
         it "returns 200" do
@@ -52,7 +53,8 @@ RSpec.describe "Api::V1::Forms", type: :request do
         end
 
         it "returned Form with right datas" do
-          expect(json).to eql(JSON.parse(@form.to_json))
+          expect(json.except('questions')).to eql(JSON.parse(@form.to_json))
+          expect(json['questions']).to eql(JSON.parse(@form.questions.to_json))
         end
 
         it "returned associated questions" do
@@ -67,7 +69,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
         end
 
         it "returns 404" do
-          get "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+          get "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: headers_with_authentication(@user)
           expect_status(404)
         end
       end
@@ -75,7 +77,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
 
     context "When form dont exists" do
       it "returns 404" do
-        get "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: header_with_authentication(@user)
+        get "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: headers_with_authentication(@user)
         expect_status(404)
       end
     end
@@ -89,12 +91,14 @@ RSpec.describe "Api::V1::Forms", type: :request do
     context "With valid authentication headers" do
       before do
         @user = create(:user)
+
+        @user.create_new_auth_token
       end
 
       context "And with valid params" do
         before do
           @form_attributes = attributes_for(:form)
-          post "/api/v1/forms", params: {form: @form_attributes}, headers: header_with_authentication(@user)
+          post "/api/v1/forms", params: {form: @form_attributes}, headers: headers_with_authentication(@user)
         end
 
         it "returns 200" do
@@ -117,7 +121,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
       context "And with invalid params" do
         before do
           @other_user = create(:user)
-          post "/api/v1/forms", params: {form: {}}, headers: header_with_authentication(@user)
+          post "/api/v1/forms", params: {form: {}}, headers: headers_with_authentication(@user)
         end
 
         it "returns 400" do
@@ -135,6 +139,8 @@ RSpec.describe "Api::V1::Forms", type: :request do
     context "With valid authentication headers" do
       before do
         @user = create(:user)
+
+        @user.create_new_auth_token
       end
 
       context "When form exists" do
@@ -143,7 +149,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
           before do
             @form = create(:form, user: @user)
             @form_attributes = attributes_for(:form, id: @form.id)
-            put "/api/v1/forms/#{@form.friendly_id}", params: {form: @form_attributes}, headers: header_with_authentication(@user)
+            put "/api/v1/forms/#{@form.friendly_id}", params: {form: @form_attributes}, headers: headers_with_authentication(@user)
           end
 
           it "returns 200" do
@@ -168,7 +174,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
           before do
             @form = create(:form)
             @form_attributes = attributes_for(:form, id: @form.id)
-            put "/api/v1/forms/#{@form.friendly_id}", params: {form: @form_attributes}, headers: header_with_authentication(@user)
+            put "/api/v1/forms/#{@form.friendly_id}", params: {form: @form_attributes}, headers: headers_with_authentication(@user)
           end
 
           it "returns 403" do
@@ -183,7 +189,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
         end
 
         it "returns 404" do
-          put "/api/v1/forms/#{FFaker::Lorem.word}", params: {form: @form_attributes}, headers: header_with_authentication(@user)
+          put "/api/v1/forms/#{FFaker::Lorem.word}", params: {form: @form_attributes}, headers: headers_with_authentication(@user)
           expect_status(404)
         end
       end
@@ -193,6 +199,8 @@ RSpec.describe "Api::V1::Forms", type: :request do
   describe "DELETE /forms/:friendly_id" do
     before do
       @user = create(:user)
+
+      @user.create_new_auth_token
     end
 
     context "With Invalid authentication headers" do
@@ -207,7 +215,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
           before do
             @form = create(:form, user: @user)
             @question = create(:question, form: @form)
-            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: headers_with_authentication(@user)
           end
 
           it "returns 200" do
@@ -226,7 +234,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
         context "And user is not the owner" do
           before do
             @form = create(:form)
-            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: headers_with_authentication(@user)
           end
 
           it "returns 403" do
@@ -237,7 +245,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
 
       context "When form dont exists" do
         it "returns 404" do
-          delete "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: header_with_authentication(@user)
+          delete "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: headers_with_authentication(@user)
           expect_status(404)
         end
       end
@@ -247,7 +255,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
         context "And user is the owner" do
           before do
             @form = create(:form, user: @user)
-            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: headers_with_authentication(@user)
           end
 
           it "returns 200" do
@@ -262,7 +270,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
         context "And user is not the owner" do
           before do
             @form = create(:form)
-            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: headers_with_authentication(@user)
           end
 
           it "returns 403" do
@@ -273,7 +281,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
 
       context "When form dont exists" do
         it "returns 404" do
-          delete "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: header_with_authentication(@user)
+          delete "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: headers_with_authentication(@user)
           expect_status(404)
         end
       end
