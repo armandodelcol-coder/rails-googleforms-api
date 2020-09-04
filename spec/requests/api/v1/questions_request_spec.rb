@@ -10,13 +10,15 @@ RSpec.describe "Api::V1::Questions", type: :request do
     context "With valid authentication headers" do
       before do
         @user = create(:user)
+
+        @user.create_new_auth_token
       end
 
       context "And with valid params" do
         before do
           @form = create(:form, user: @user)
           @question_attributes = attributes_for(:question)
-          post "/api/v1/questions", params: {question: @question_attributes, form_id: @form.id}, headers: header_with_authentication(@user)
+          post "/api/v1/questions", params: {question: @question_attributes, form_id: @form.id}, headers: headers_with_authentication(@user)
         end
 
         it "returns 200" do
@@ -47,14 +49,14 @@ RSpec.describe "Api::V1::Questions", type: :request do
           end
 
           it "returns 400" do
-            post "/api/v1/questions", params: {question: {}, form_id: @form.id}, headers: header_with_authentication(@user)
+            post "/api/v1/questions", params: {question: {}, form_id: @form.id}, headers: headers_with_authentication(@user)
             expect_status(400)
           end
         end
 
         context "invalid form" do
           it "returns 404" do
-            post "/api/v1/questions", params: {question: {}}, headers: header_with_authentication(@user)
+            post "/api/v1/questions", params: {question: {}}, headers: headers_with_authentication(@user)
             expect_status(404)
           end
         end
@@ -70,6 +72,8 @@ RSpec.describe "Api::V1::Questions", type: :request do
     context "With valid authentication headers" do
       before do
         @user = create(:user)
+
+        @user.create_new_auth_token
       end
 
       context "When question exists" do
@@ -79,7 +83,7 @@ RSpec.describe "Api::V1::Questions", type: :request do
             @form = create(:form, user: @user)
             @question = create(:question, form: @form)
             @question_attributes = attributes_for(:question)
-            put "/api/v1/questions/#{@question.id}", params: {question: @question_attributes}, headers: header_with_authentication(@user)
+            put "/api/v1/questions/#{@question.id}", params: {question: @question_attributes}, headers: headers_with_authentication(@user)
           end
 
           it "returns 200" do
@@ -104,7 +108,7 @@ RSpec.describe "Api::V1::Questions", type: :request do
           before do
             @question = create(:question)
             @question_attributes = attributes_for(:question, id: @question.id)
-            put "/api/v1/questions/#{@question.id}", params: {question: @question_attributes}, headers: header_with_authentication(@user)
+            put "/api/v1/questions/#{@question.id}", params: {question: @question_attributes}, headers: headers_with_authentication(@user)
           end
 
           it "returns 403" do
@@ -119,7 +123,7 @@ RSpec.describe "Api::V1::Questions", type: :request do
         end
 
         it "returns 404" do
-          delete "/api/v1/questions/0", params: {question: @question_attributes}, headers: header_with_authentication(@user)
+          delete "/api/v1/questions/0", params: {question: @question_attributes}, headers: headers_with_authentication(@user)
           expect_status(404)
         end
       end
@@ -129,6 +133,8 @@ RSpec.describe "Api::V1::Questions", type: :request do
   describe "DELETE /questions/:id" do
     before do
       @user = create(:user)
+
+      @user.create_new_auth_token
     end
 
     context "With Invalid authentication headers" do
@@ -143,7 +149,7 @@ RSpec.describe "Api::V1::Questions", type: :request do
           before do
             @form = create(:form, user: @user)
             @question = create(:question, form: @form)
-            delete "/api/v1/questions/#{@question.id}", params: {}, headers: header_with_authentication(@user)
+            delete "/api/v1/questions/#{@question.id}", params: {}, headers: headers_with_authentication(@user)
           end
 
           it "returns 200" do
@@ -158,7 +164,7 @@ RSpec.describe "Api::V1::Questions", type: :request do
         context "And user is not the owner" do
           before do
             @question = create(:question)
-            delete "/api/v1/questions/#{@question.id}", params: {}, headers: header_with_authentication(@user)
+            delete "/api/v1/questions/#{@question.id}", params: {}, headers: headers_with_authentication(@user)
           end
 
           it "returns 403" do
@@ -169,7 +175,7 @@ RSpec.describe "Api::V1::Questions", type: :request do
 
       context "When question dont exists" do
         it "returns 404" do
-          delete "/api/v1/questions/0", params: {}, headers: header_with_authentication(@user)
+          delete "/api/v1/questions/0", params: {}, headers: headers_with_authentication(@user)
           expect_status(404)
         end
       end
