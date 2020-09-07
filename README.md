@@ -1,24 +1,38 @@
-# README
+## About
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This project was built to learn about rails api only mode.
 
-Things you may want to cover:
+It's a google forms clone
 
-* Ruby version
+### To-do
 
-* System dependencies
+- Apply simple JWT Auth
+- Improve Seeds
+- Deploy
+- Documentation (Swagger)
 
-* Configuration
+## Dependencies
 
-* Database creation
+I build this project use a linux Ubuntu 20.04 SO but i generate and run all dependencies in docker.
 
-* Database initialization
+- Ruby 2.7.1
+- rails 6.0.3
+- bundler
+- postgresql
 
-* How to run the test suite
+## Deployment
 
-* Services (job queues, cache servers, search engines, etc.)
+Todo
 
-* Deployment instructions
+## Local Configs
 
-* ...
+If you want to fork or clone this project to run in your machine, you will need to have a docker and docker-compose installed.
+
+- run the `docker-compose build`
+- run the `docker-compose run --rm app bundle`
+- run the `docker-compose run --rm app bundle exec rails db:migrate`
+- run the `docker-compose up`
+
+## Final words
+
+Thank's for visit my github project =).
